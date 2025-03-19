@@ -12,11 +12,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitButton = document.getElementById("submitButton");
     const taskSidebar = document.getElementById("taskSidebar");
 
-    // Simulate the logged-in user (replace with actual logged-in user data)
-    let currentUser = {
-        email: "user@example.com",
-        role: "admin" // Can be "admin" or "user"
+    // // Simulate the logged-in user (replace with actual logged-in user data)
+    // let currentUser = {
+    //     email: "user@example.com",
+    //     role: "admin" // Can be "admin" or "user"
+    // };
+
+
+    // Retrieve user data from localStorage
+const storedUser = JSON.parse(localStorage.getItem("user"));
+
+let currentUser = {};
+
+if (storedUser) {
+    currentUser = {
+        email: storedUser.email,
+        role: storedUser.isAdmin ? "admin" : "user" // Set role based on isAdmin flag
     };
+} else {
+    console.log("No user data found, redirecting to login...");
+    window.location.href = "login.html"; // Redirect to login page if no user is found
+}
 
     // Example tasks (replace with data fetched from the backend)
     let tasks = [
@@ -103,15 +119,29 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".completed-task-count").textContent = completedTasks.length;
     }
 
-    // Function to handle user roles
-    function handleUserRole() {
-        const allActivitiesLink = document.getElementById("allActivities");
-        if (currentUser.isAdmin === true) {
-            allActivitiesLink.style.display = "block"; // Show for admin
-        } else {
-            allActivitiesLink.style.display = "none"; // Hide for regular users
-        }
+    // // Function to handle user roles
+    // function handleUserRole() {
+    //     const allActivitiesLink = document.getElementById("allActivities");
+    //     if (currentUser.isAdmin === true) {
+    //         allActivitiesLink.style.display = "block"; // Show for admin
+    //     } else {
+    //         allActivitiesLink.style.display = "none"; // Hide for regular users
+    //     }
+    // }
+
+
+    // Function to handle UI changes based on user role
+function handleUserRole() {
+    const allActivitiesLink = document.getElementById("allActivities");
+
+    if (currentUser.role === "admin") {
+        allActivitiesLink.style.display = "block"; // Show for admin
+        console.log("Admin access granted");
+    } else {
+        allActivitiesLink.style.display = "none"; // Hide for normal users
+        console.log("User access granted");
     }
+}
 
     // Event listeners for navigation links
     allActivitiesLink.addEventListener("click", function () {
