@@ -68,16 +68,17 @@ h2 {
     background: #0062E6;
 }
 
-p {
+.login-text {
     text-align: center;
     margin-top: 20px;
 }
 
-p a {
+.login-text a {
     color: #33AEFF;
     text-decoration: none;
 }
 
-p a:hover {
-    text-decoration: underline;
+.login-text a:hover {
+    text-decoration:underline;
+    color: #0062E6;
 }
