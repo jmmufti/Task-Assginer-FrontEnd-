@@ -12,55 +12,38 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitButton = document.getElementById("submitButton");
     const taskSidebar = document.getElementById("taskSidebar");
 
-    // // Simulate the logged-in user (replace with actual logged-in user data)
-    // let currentUser = {
-    //     email: "user@example.com",
-    //     role: "admin" // Can be "admin" or "user"
-    // };
-
-
     // Retrieve user data from localStorage
-const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
 
-let currentUser = {};
+    let currentUser = {};
 
-if (storedUser) {
-    currentUser = {
-        email: storedUser.email,
-        role: storedUser.isAdmin ? "admin" : "user" // Set role based on isAdmin flag
-    };
-} else {
-    console.log("No user data found, redirecting to login...");
-    window.location.href = "login.html"; // Redirect to login page if no user is found
-}
+    if (storedUser) {
+        currentUser = {
+            email: storedUser.email,
+            role: storedUser.isAdmin ? "admin" : "user" // Set role based on isAdmin flag
+        };
+    } else {
+        console.log("No user data found, redirecting to login...");
+        window.location.href = "login.html"; // Redirect to login page if no user is found
+    }
 
-    // Example tasks (replace with data fetched from the backend)
-    let tasks = [
-        {
-            id: 1,
-            taskName: "Watch a 2-min video",
-            taskDescription: "Watch a tutorial video",
-            taskCreatedBy: currentUser.email,
-            taskAssignedTo: ["user2@example.com"],
-            taskProgress: "Unassigned",
-        },
-        {
-            id: 2,
-            taskName: "Download Bordio’s mobile app",
-            taskDescription: "Download and install the app",
-            taskCreatedBy: currentUser.email,
-            taskAssignedTo: ["user@example.com"],
-            taskProgress: "In progress",
-        },
-        {
-            id: 3,
-            taskName: "Do a mind sweep",
-            taskDescription: "Clear your mind by writing down tasks",
-            taskCreatedBy: currentUser.email,
-            taskAssignedTo: ["user3@example.com"],
-            taskProgress: "Completed",
+    // Array to store tasks fetched from the API
+    let tasks = [];
+
+    // Function to fetch tasks from the API
+    async function fetchTasks() {
+        try {
+            const response = await fetch("https://task-assginer.onrender.com/api/tasks");
+            if (!response.ok) {
+                throw new Error("Failed to fetch tasks");
+            }
+            tasks = await response.json();
+            renderTasks("all"); // Render all tasks initially
+        } catch (error) {
+            console.error("Error fetching tasks:", error);
+            alert("Failed to fetch tasks. Please try again.");
         }
-    ];
+    }
 
     // Function to render tasks based on the filter
     function renderTasks(filter = "all") {
@@ -84,14 +67,14 @@ if (storedUser) {
         activeTasks.forEach(task => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td onclick="showTaskDetails(${task.id})">${task.taskName}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskDescription}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskCreatedBy}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskAssignedTo.join(", ")}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskProgress}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskName}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskDescription}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskCreatedBy}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskAssignedTo.join(", ")}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskProgress}</td>
                 <td class="actions">
-                    <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                    <button class="edit-btn" onclick="editTask('${task._id}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteTask('${task._id}')">Delete</button>
                 </td>
             `;
             activeTaskList.appendChild(row);
@@ -101,14 +84,14 @@ if (storedUser) {
         completedTasks.forEach(task => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td onclick="showTaskDetails(${task.id})">${task.taskName}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskDescription}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskCreatedBy}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskAssignedTo.join(", ")}</td>
-                <td onclick="showTaskDetails(${task.id})">${task.taskProgress}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskName}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskDescription}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskCreatedBy}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskAssignedTo.join(", ")}</td>
+                <td onclick="showTaskDetails('${task._id}')">${task.taskProgress}</td>
                 <td class="actions">
-                    <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                    <button class="edit-btn" onclick="editTask('${task._id}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteTask('${task._id}')">Delete</button>
                 </td>
             `;
             completedTaskList.appendChild(row);
@@ -119,29 +102,18 @@ if (storedUser) {
         document.querySelector(".completed-task-count").textContent = completedTasks.length;
     }
 
-    // // Function to handle user roles
-    // function handleUserRole() {
-    //     const allActivitiesLink = document.getElementById("allActivities");
-    //     if (currentUser.isAdmin === true) {
-    //         allActivitiesLink.style.display = "block"; // Show for admin
-    //     } else {
-    //         allActivitiesLink.style.display = "none"; // Hide for regular users
-    //     }
-    // }
-
-
     // Function to handle UI changes based on user role
-function handleUserRole() {
-    const allActivitiesLink = document.getElementById("allActivities");
+    function handleUserRole() {
+        const allActivitiesLink = document.getElementById("allActivities");
 
-    if (currentUser.role === "admin") {
-        allActivitiesLink.style.display = "block"; // Show for admin
-        console.log("Admin access granted");
-    } else {
-        allActivitiesLink.style.display = "none"; // Hide for normal users
-        console.log("User access granted");
+        if (currentUser.role === "admin") {
+            allActivitiesLink.style.display = "block"; // Show for admin
+            console.log("Admin access granted");
+        } else {
+            allActivitiesLink.style.display = "none"; // Hide for normal users
+            console.log("User access granted");
+        }
     }
-}
 
     // Event listeners for navigation links
     allActivitiesLink.addEventListener("click", function () {
@@ -170,13 +142,12 @@ function handleUserRole() {
         modalTitle.textContent = "Create Task";
         submitButton.textContent = "Create Task";
         taskForm.reset();
-        
-        // Set the 'Created By' field to the logged-in user's email
         document.getElementById("taskCreatedByDisplay").textContent = `Created By: ${currentUser.email}`;
-
         modal.style.display = "block";
+        currentTaskId = null; // Reset currentTaskId for new task creation
     });
 
+    // Close modal functionality
     closeModal.addEventListener("click", function () {
         modal.style.display = "none";
     });
@@ -190,8 +161,8 @@ function handleUserRole() {
     let currentTaskId = null;
 
     // Function to edit a task
-    window.editTask = function (taskId) {
-        const task = tasks.find(task => task.id === taskId);
+    window.editTask = async function (taskId) {
+        const task = tasks.find(task => task._id === taskId);
         if (task) {
             currentTaskId = taskId;
             modalTitle.textContent = "Edit Task";
@@ -206,13 +177,31 @@ function handleUserRole() {
     };
 
     // Function to delete a task
-    window.deleteTask = function (taskId) {
-        tasks = tasks.filter(task => task.id !== taskId);
-        renderTasks(allActivitiesLink.classList.contains("active") ? "all" : "my");
+    window.deleteTask = async function (taskId) {
+        if (confirm("Are you sure you want to delete this task?")) {
+            try {
+                const response = await fetch(`https://task-assginer.onrender.com/api/tasks/${taskId}`, {
+                    method: "DELETE"
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to delete task");
+                }
+
+                const result = await response.json();
+                if (result.message === "Task deleted successfully") {
+                    tasks = tasks.filter(task => task._id !== taskId); // Remove the task from the local array
+                    renderTasks(allActivitiesLink.classList.contains("active") ? "all" : "my");
+                }
+            } catch (error) {
+                console.error("Error deleting task:", error);
+                alert("Failed to delete task. Please try again.");
+            }
+        }
     };
 
     // Handle form submission (create or update task)
-    taskForm.addEventListener("submit", function (event) {
+    taskForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const taskName = document.getElementById("taskName").value;
@@ -220,39 +209,59 @@ function handleUserRole() {
         const taskAssignedTo = document.getElementById("taskAssignedTo").value.split(",").map(email => email.trim());
         const taskProgress = document.getElementById("taskProgress").value;
 
-        // Use the logged-in user's email for 'Created By'
-        const taskCreatedBy = currentUser.email;
+        const taskData = {
+            taskName,
+            taskDescription,
+            taskAssignedTo,
+            taskProgress
+        };
 
-        if (currentTaskId) {
-            // Update existing task
-            const taskIndex = tasks.findIndex(task => task.id === currentTaskId);
-            if (taskIndex !== -1) {
-                tasks[taskIndex] = {
-                    ...tasks[taskIndex],
-                    taskName,
-                    taskDescription,
-                    taskCreatedBy,
-                    taskAssignedTo,
-                    taskProgress
-                };
+        try {
+            let response;
+            if (currentTaskId) {
+                // Update existing task
+                response = await fetch(`https://task-assginer.onrender.com/api/tasks/${currentTaskId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(taskData)
+                });
+            } else {
+                // Create new task
+                response = await fetch("https://task-assginer.onrender.com/api/tasks/addtask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(taskData)
+                });
             }
-        } else {
-            // Create new task
-            const newTask = {
-                id: tasks.length + 1,
-                taskName,
-                taskDescription,
-                taskCreatedBy,
-                taskAssignedTo,
-                taskProgress
-            };
-            tasks.push(newTask);
-        }
 
-        renderTasks(allActivitiesLink.classList.contains("active") ? "all" : "my");
-        modal.style.display = "none";
-        taskForm.reset();
-        currentTaskId = null;
+            if (!response.ok) {
+                throw new Error("Failed to update task");
+            }
+
+            const updatedTask = await response.json();
+            if (currentTaskId) {
+                // Update the task in the local array
+                const taskIndex = tasks.findIndex(task => task._id === currentTaskId);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = updatedTask;
+                }
+            } else {
+                // Add the new task to the local array
+                tasks.push(updatedTask);
+            }
+
+            renderTasks(allActivitiesLink.classList.contains("active") ? "all" : "my");
+            modal.style.display = "none";
+            taskForm.reset();
+            currentTaskId = null;
+        } catch (error) {
+            console.error("Error updating task:", error);
+            alert("Failed to update task. Please try again.");
+        }
     });
 
     // Profile dropdown functionality
@@ -276,12 +285,12 @@ function handleUserRole() {
 
     // Logout functionality
     function logout() {
+        localStorage.removeItem("user"); // Remove user data from localStorage
         alert("Logging out...");
-        // Add your logout logic here (e.g., redirect to login page)
-        window.location.href = "/login.html";
+        window.location.href = "login.html"; // Redirect to login page
     }
 
     // Initial setup
     handleUserRole(); // Handle user role on page load
-    renderTasks("all"); // Render tasks initially
+    fetchTasks(); // Fetch tasks from the API on page load
 });
