@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
             //////////////////////////////////////////////////
             /////////PLACEHOLDER FOR HOME PAGE ///////////////
             /////////////////////////////////////////////////
-            window.location.href = "index.html"; // Redirect after login
+            window.location.href = "Main.html"; // Redirect after login
 
         } catch (error) {
             console.error("Error:", error);  // Log the error
