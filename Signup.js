@@ -1,54 +1,56 @@
-document.getElementById("signUpForm").addEventListener("submit", async function (event) {
-  event.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
+  const signUpForm = document.querySelector("#signUp-form");
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const confirmPassword = document.getElementById("confirmPassword").value.trim();
-  const errorMessage = document.getElementById("error-message");
+  signUpForm.addEventListener("submit", async function (event) {
+      event.preventDefault(); // Prevent default form submission
 
-  // Clear previous error messages
-  errorMessage.textContent = "";
+      // Get user input values
+      const username = document.querySelector("#name").value;
+      const email = document.querySelector("#email").value;
+      const password = document.querySelector("#password").value;
+      const confirmPassword = document.querySelector("#confirmPassword").value;
 
-  // ✅ Check if all fields are filled
-  if (!email || !password || !confirmPassword) {
-      errorMessage.textContent = "Please fill in all fields.";
-      return;
-  }
+      const apiUrl = "https://task-assginer.onrender.com/api/auth/signup"; // API endpoint
 
-  // ✅ Password length check
-  if (password.length < 8) {
-      errorMessage.textContent = "Password must be at least 8 characters long.";
-      return;
-  }
-
-  // ✅ Password match check
-  if (password !== confirmPassword) {
-      errorMessage.textContent = "Passwords do not match.";
-      return;
-  }
-
-  const requestBody = { email, password };
-
-  try {
-      console.log("Sending request:", requestBody); // ✅ Debugging Log
-
-      const response = await fetch("https://task-assginer.onrender.com/api/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
-      });
-
-      const data = await response.json();
-      console.log("Response:", data); // ✅ Debugging Log
-
-      if (response.ok) {
-          localStorage.setItem("token", data.token); // Store token securely
-          window.location.href = "dashboard.html"; // Redirect to dashboard
-      } else {
-          errorMessage.textContent = data.message || "Signup failed.";
+      // Basic validation before sending to the server
+      if (password !== confirmPassword) {
+          alert("Passwords do not match.");
+          return;
       }
-  } catch (error) {
-      console.error("Fetch error:", error); // ✅ Debugging Log
-      errorMessage.textContent = "Network error. Please try again.";
-  }
+
+      if (password.length < 8) {
+          alert("Password must be at least 8 characters.");
+          return;
+      }
+
+      try {
+          const response = await fetch(apiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, email, password }) // Send credentials
+          });
+
+          const data = await response.json();  // Parse the response
+
+          if (!response.ok) {
+              throw new Error(data.message || "Sign-up failed. Please try again.");
+          }
+
+          console.log("Sign-up successful:", data);  // Log success message
+
+          // Store user data (excluding password)
+          localStorage.setItem("user", JSON.stringify({
+              _id: data._id,
+              username: data.username,
+              email: data.email,
+              isAdmin: data.isAdmin
+          }));
+
+          window.location.href = "Main.html"; // Redirect after sign-up
+
+      } catch (error) {
+          console.error("Error:", error);  // Log the error
+          alert(error.message); // Show error to the user
+      }
+  });
 });
