@@ -1,9 +1,4 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* General styles */
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(to right, #a06b99, #8796a0);
@@ -11,21 +6,39 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 0;
 }
 
-.signup-container {
-    width: 100%;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.9);
+/* Login container */
+.login-container {
+    background: #fff;
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
 }
 
-h2 {
-    text-align: center;
+/* Input fields */
+.input-group {
+    margin: 15px 0;
+    margin-right: 10px;
+    text-align: left;
+}
+
+label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 5px;
     color: #333;
-    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 .input-group {
@@ -52,33 +65,34 @@ h2 {
     border-color: #33AEFF;
 }
 
-.submit-btn {
-    width: 100%;
-    padding: 10px;
+/* Button */
+.login-btn {
     background: #33AEFF;
     color: white;
-    font-size: 16px;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    width: 100%;
+    font-size: 16px;
 }
 
-.submit-btn:hover {
+.login-btn:hover {
     background: #0062E6;
 }
 
-.login-text {
-    text-align: center;
-    margin-top: 20px;
+/* Sign-up link */
+.signup-text {
+    margin-top: 10px;
+    font-size: 14px;
 }
 
-.login-text a {
+.signup-text a {
     color: #33AEFF;
     text-decoration: none;
 }
 
-.login-text a:hover {
-    text-decoration:underline;
+.signup-text a:hover {
     color: #0062E6;
+    text-decoration: underline;
 }
