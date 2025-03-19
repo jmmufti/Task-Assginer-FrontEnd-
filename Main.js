@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function logout() {
         alert("Logging out...");
         // Add your logout logic here (e.g., redirect to login page)
-        window.location.href = "/login";
+        window.location.href = "/login.html";
     }
 
     // Initial setup

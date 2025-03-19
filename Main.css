@@ -313,11 +313,14 @@ form button:hover {
     z-index: 1000; /* Ensure it appears above other elements */
 }
 
-.profile-icon img {
-    width: 100px; /* Set a width for the profile icon */
-    height: 100px; /* Maintain aspect ratio */
-    cursor: pointer; /* Change cursor to pointer */
+.profile-icon h3 {
+    color: rgb(47, 139, 245); /* Change text color to blue */
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0;
 }
+
+
 
 .dropdown-content {
     display: none; /* Hide dropdown by default */

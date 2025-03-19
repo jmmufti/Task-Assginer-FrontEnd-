@@ -33,9 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 isAdmin: data.isAdmin
             }));
 
-
-
-            alert("Login successful!");
             //////////////////////////////////////////////////
             /////////PLACEHOLDER FOR HOME PAGE ///////////////
             /////////////////////////////////////////////////
