@@ -33,7 +33,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 isAdmin: data.isAdmin
             }));
 
+
+
             alert("Login successful!");
+            //////////////////////////////////////////////////
+            /////////PLACEHOLDER FOR HOME PAGE ///////////////
+            /////////////////////////////////////////////////
             window.location.href = "index.html"; // Redirect after login
 
         } catch (error) {
