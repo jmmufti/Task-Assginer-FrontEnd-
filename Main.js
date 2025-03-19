@@ -33,12 +33,45 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to fetch tasks from the API
     async function fetchTasks() {
         try {
-            const response = await fetch("https://task-assginer.onrender.com/api/tasks");
-            if (!response.ok) {
-                throw new Error("Failed to fetch tasks");
-            }
-            tasks = await response.json();
-            renderTasks("all"); // Render all tasks initially
+            document.cookie = "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwMzM2MSwiZXhwIjoxNzQ0OTk1MzYxfQ.GU70IMf1eNP1Bl6BdPTP1WLQ5k1_AxckrzvVxMpuAhU";
+
+            const myHeaders = new Headers();
+            myHeaders.append("Cookie", "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwMzM2MSwiZXhwIjoxNzQ0OTk1MzYxfQ.GU70IMf1eNP1Bl6BdPTP1WLQ5k1_AxckrzvVxMpuAhU");
+
+         
+            const requestOptions = {
+                method: "GET",
+                credentials: "include", // Ensures cookies are sent with the request
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                redirect: "follow"
+            };
+            // const requestOptions = {
+            // method: "GET",
+            // headers: myHeaders,
+            // //body: raw,
+            // redirect: "follow"
+            // };
+            fetch("https://task-assginer.onrender.com/api/tasks/", requestOptions)
+            .then((response) => response.json())
+            .then((data) => console.log(data))
+            .catch((error) => console.log("Error:", error));
+            // fetch("https://task-assginer.onrender.com/api/tasks/", requestOptions)
+            // .then((response) => console.log(response))
+            // const response = await fetch("https://task-assginer.onrender.com/api/tasks", {
+            //     headers: {
+            //         "Cookie": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwMzM2MSwiZXhwIjoxNzQ0OTk1MzYxfQ.GU70IMf1eNP1Bl6BdPTP1WLQ5k1_AxckrzvVxMpuAhU"
+            //     }
+            // });
+
+            // if (!response.ok) {
+            //     throw new Error(`HTTP error! Status: ${response.status}`);
+            // }
+
+            // const data = await response.json();
+            // tasks = data;
+            // renderTasks("all"); // Render all tasks initially
         } catch (error) {
             console.error("Error fetching tasks:", error);
             alert("Failed to fetch tasks. Please try again.");
@@ -181,7 +214,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (confirm("Are you sure you want to delete this task?")) {
             try {
                 const response = await fetch(`https://task-assginer.onrender.com/api/tasks/${taskId}`, {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
                 });
 
                 if (!response.ok) {
@@ -223,7 +259,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 response = await fetch(`https://task-assginer.onrender.com/api/tasks/${currentTaskId}`, {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
                     },
                     body: JSON.stringify(taskData)
                 });
@@ -232,7 +269,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 response = await fetch("https://task-assginer.onrender.com/api/tasks/addtask", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
                     },
                     body: JSON.stringify(taskData)
                 });
@@ -285,9 +323,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Logout functionality
     function logout() {
-        localStorage.removeItem("user"); // Remove user data from localStorage
-        alert("Logging out...");
-        window.location.href = "login.html"; // Redirect to login page
+        fetch("https://task-assginer.onrender.com/api/auth/logout", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                localStorage.removeItem("user"); // Remove user data from localStorage
+                localStorage.removeItem("token"); // Remove token from localStorage
+                alert("Logged out successfully");
+                window.location.href = "login.html"; // Redirect to login page
+            } else {
+                throw new Error("Failed to logout");
+            }
+        })
+        .catch(error => {
+            console.error("Error logging out:", error);
+            alert("Failed to logout. Please try again.");
+        });
     }
 
     // Initial setup
