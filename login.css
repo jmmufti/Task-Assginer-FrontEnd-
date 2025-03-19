@@ -1,7 +1,7 @@
 /* General styles */
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(to right, #a06b99, #8796a0);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,7 +12,7 @@ body {
 /* Login container */
 .login-container {
     background: #fff;
-    padding: 20px;
+    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -36,14 +36,38 @@ label {
 input {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
 }
 
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    color: #333;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: #33AEFF;
+}
+
 /* Button */
 .login-btn {
-    background: #667eea;
+    background: #33AEFF;
     color: white;
     padding: 10px;
     border: none;
@@ -54,7 +78,7 @@ input {
 }
 
 .login-btn:hover {
-    background: #5563c1;
+    background: #0062E6;
 }
 
 /* Sign-up link */
@@ -64,10 +88,11 @@ input {
 }
 
 .signup-text a {
-    color: #667eea;
+    color: #33AEFF;
     text-decoration: none;
 }
 
 .signup-text a:hover {
+    color: #0062E6;
     text-decoration: underline;
 }
