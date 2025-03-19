@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Main.css"> <!-- CSS File -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
+    <script src="Main.js" defer></script>  <!-- JavaScript File -->
+</head>
+<body>
+    <div class="container">
+        <!-- Profile dropdown in the top-right corner -->
+        <div class="profile-dropdown">
+            <div class="profile-icon" onclick="toggleDropdown()">
+                <img src="profile-icon.png" alt="Profile"> <!-- Replace with your profile icon -->
+            </div>
+            <div id="dropdownMenu" class="dropdown-content">
+                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <h2>My Workspace</h2>
+            <nav>
+                <ul>
+                    <li id="allActivities" class="active" data-role="admin"><i class="fas fa-tasks"></i> All Activities</li>
+                    <li id="myActivities"><i class="fas fa-user"></i> My Activities</li>
+                    <li id="createdTasks"><i class="fas fa-pen"></i> Created Tasks</li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="task-container">
+            <header class="task-header">
+                <button class="add-task"><i class="fas fa-plus"></i> Add New</button>
+            </header>
+            <section class="task-list">
+                <h3>Active Tasks <span class="task-count">24</span></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th onclick="sortTasks('taskCreatedBy')">Created By <i id="sortCreatedBy" class="fas fa-sort"></i></th>
+                            <th onclick="sortTasks('taskAssignedTo')">Assigned To <i id="sortAssignedTo" class="fas fa-sort"></i></th>
+                            <th onclick="sortTasks('taskProgress')">Progress <i id="sortProgress" class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-task-list">
+                        <!-- Dynamic active task rows will be inserted here -->
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Completed Tasks Section -->
+            <section class="task-list completed-task-list">
+                <h3>Completed Tasks <span class="completed-task-count">0</span></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th onclick="sortTasks('taskCreatedBy')">Created By <i id="sortCreatedBy" class="fas fa-sort"></i></th>
+                            <th onclick="sortTasks('taskAssignedTo')">Assigned To <i id="sortAssignedTo" class="fas fa-sort"></i></th>
+                            <th onclick="sortTasks('taskProgress')">Progress <i id="sortProgress" class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completed-task-list">
+                        <!-- Dynamic completed task rows will be inserted here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+        <!-- Sidebar for task details -->
+        <div id="taskSidebar" class="task-sidebar">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+            <h2 id="sidebarTaskName"></h2>
+            <div id="sidebarTaskDetails">
+                <p><strong>Progress:</strong> <span id="sidebarTaskProgress"></span></p>
+                <p><strong>Created By:</strong> <span id="sidebarTaskCreatedBy"></span></p>
+                <p><strong>Assigned To:</strong> <span id="sidebarTaskAssignedTo"></span></p>
+            </div>
+            <div id="sidebarTaskDescription">
+                <h3>Description</h3>
+                <p id="sidebarTaskDescriptionText"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/editing a task -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Create Task</h2>
+            <form id="taskForm">
+                <label for="taskName">Task Name</label>
+                <input type="text" id="taskName" name="taskName" required>
+
+                <label for="taskDescription">Task Description</label>
+                <textarea id="taskDescription" name="taskDescription" required></textarea>
+
+                <p id="taskCreatedByDisplay"></p> <!-- Display the created by email -->
+
+                <label for="taskAssignedTo">Assigned To (comma-separated emails)</label>
+                <input type="text" id="taskAssignedTo" name="taskAssignedTo" required>
+
+                <label for="taskProgress">Progress</label>
+                <select id="taskProgress" name="taskProgress" required>
+                    <option value="Unassigned">Unassigned</option>
+                    <option value="In progress">In progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Testing phase">Testing phase</option>
+                </select>
+
+                <button type="submit" id="submitButton">Create Task</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
