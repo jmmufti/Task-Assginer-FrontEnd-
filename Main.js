@@ -33,20 +33,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to fetch tasks from the API
     async function fetchTasks() {
         try {
-            document.cookie = "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwMzM2MSwiZXhwIjoxNzQ0OTk1MzYxfQ.GU70IMf1eNP1Bl6BdPTP1WLQ5k1_AxckrzvVxMpuAhU";
-
-            const myHeaders = new Headers();
-            myHeaders.append("Cookie", "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwMzM2MSwiZXhwIjoxNzQ0OTk1MzYxfQ.GU70IMf1eNP1Bl6BdPTP1WLQ5k1_AxckrzvVxMpuAhU");
-
-         
             const requestOptions = {
                 method: "GET",
                 credentials: "include", // Ensures cookies are sent with the request
                 headers: {
                     "Content-Type": "application/json",
+                    //"Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwODEyMCwiZXhwIjoxNzQ1MDAwMTIwfQ.8_7aLxps_-QJoQyW4M3e0XJLVp0N9vNmH38FTt3Xax0"
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
                 },
                 redirect: "follow"
-            };
+            }
             // const requestOptions = {
             // method: "GET",
             // headers: myHeaders,
