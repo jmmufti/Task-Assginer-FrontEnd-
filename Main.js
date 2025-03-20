@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalTitle = document.getElementById("modalTitle");
     const submitButton = document.getElementById("submitButton");
     const taskSidebar = document.getElementById("taskSidebar");
+    const taskAssignedToSelect = document.getElementById("taskAssignedTo");
 
     // Retrieve user data from localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -27,70 +28,161 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "login.html"; // Redirect to login page if no user is found
     }
 
-    // Array to store tasks fetched from the API
+    // Arrays to store tasks fetched from the API
     let tasks = [];
+    let myTasks = [];
+    let assignedTasks = [];
 
-    // Function to fetch tasks from the API
+    // Function to fetch all tasks from the API
     async function fetchTasks() {
         try {
+            const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+            const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+
+            if (!token) {
+                throw new Error("No token found, redirecting to login...");
+            }
+
             const requestOptions = {
                 method: "GET",
                 credentials: "include", // Ensures cookies are sent with the request
                 headers: {
                     "Content-Type": "application/json",
-                    //"Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwODEyMCwiZXhwIjoxNzQ1MDAwMTIwfQ.8_7aLxps_-QJoQyW4M3e0XJLVp0N9vNmH38FTt3Xax0"
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    "Authorization": `${token}` // Include the token in the Authorization header
                 },
                 redirect: "follow"
+            };
+
+            const response = await fetch("https://task-assginer.onrender.com/api/tasks/", requestOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            // const requestOptions = {
-            // method: "GET",
-            // headers: myHeaders,
-            // //body: raw,
-            // redirect: "follow"
-            // };
-            fetch("https://task-assginer.onrender.com/api/tasks/", requestOptions)
-            .then((response) => response.json())
-            .then((data) => console.log(data))
-            .catch((error) => console.log("Error:", error));
-            // fetch("https://task-assginer.onrender.com/api/tasks/", requestOptions)
-            // .then((response) => console.log(response))
-            // const response = await fetch("https://task-assginer.onrender.com/api/tasks", {
-            //     headers: {
-            //         "Cookie": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDk0YWI1NTFmMjI2MjM5ZWNjOTFjOSIsImlhdCI6MTc0MjQwMzM2MSwiZXhwIjoxNzQ0OTk1MzYxfQ.GU70IMf1eNP1Bl6BdPTP1WLQ5k1_AxckrzvVxMpuAhU"
-            //     }
-            // });
 
-            // if (!response.ok) {
-            //     throw new Error(`HTTP error! Status: ${response.status}`);
-            // }
-
-            // const data = await response.json();
-            // tasks = data;
-            // renderTasks("all"); // Render all tasks initially
+            const data = await response.json();
+            tasks = data.tasks; // Store the fetched tasks in the tasks array
         } catch (error) {
             console.error("Error fetching tasks:", error);
             alert("Failed to fetch tasks. Please try again.");
+            window.location.href = "login.html"; // Redirect to login page if no token is found
         }
     }
 
-    // Function to render tasks based on the filter
-    function renderTasks(filter = "all") {
+    // Function to fetch my tasks from the API
+    async function fetchMyTasks() {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+            const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+
+            if (!token) {
+                throw new Error("No token found, redirecting to login...");
+            }
+
+            const requestOptions = {
+                method: "GET",
+                credentials: "include", // Ensures cookies are sent with the request
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `${token}` // Include the token in the Authorization header
+                },
+                redirect: "follow"
+            };
+
+            const response = await fetch("https://task-assginer.onrender.com/api/tasks/mytasks", requestOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            myTasks = data; // Store the fetched tasks in the myTasks array
+        } catch (error) {
+            console.error("Error fetching my tasks:", error);
+            alert("Failed to fetch my tasks. Please try again.");
+        }
+    }
+
+    // Function to fetch assigned tasks from the API
+    async function fetchAssignedTasks() {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+            const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+
+            if (!token) {
+                throw new Error("No token found, redirecting to login...");
+            }
+
+            const requestOptions = {
+                method: "GET",
+                credentials: "include", // Ensures cookies are sent with the request
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `${token}` // Include the token in the Authorization header
+                },
+                redirect: "follow"
+            };
+
+            const response = await fetch("https://task-assginer.onrender.com/api/tasks/assignedtasks", requestOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            assignedTasks = data; // Store the fetched tasks in the assignedTasks array
+        } catch (error) {
+            console.error("Error fetching assigned tasks:", error);
+            alert("Failed to fetch assigned tasks. Please try again.");
+        }
+    }
+
+    // Function to fetch users and populate the taskAssignedTo dropdown
+    async function fetchUsers() {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+            const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+
+            if (!token) {
+                throw new Error("No token found, redirecting to login...");
+            }
+
+            const requestOptions = {
+                method: "GET",
+                credentials: "include", // Ensures cookies are sent with the request
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `${token}` // Include the token in the Authorization header
+                },
+                redirect: "follow"
+            };
+
+            const response = await fetch("https://task-assginer.onrender.com/api/auth/users", requestOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const users = await response.json();
+            populateUserDropdown(users);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            alert("Failed to fetch users. Please try again.");
+        }
+    }
+
+    // Function to populate the taskAssignedTo dropdown with users
+    function populateUserDropdown(users) {
+        users.forEach(user => {
+            const option = document.createElement("option");
+            option.value = user;
+            option.textContent = user;
+            taskAssignedToSelect.appendChild(option);
+        });
+    }
+
+    // Function to render task list
+    function renderTaskList(taskList) {
         activeTaskList.innerHTML = "";
         completedTaskList.innerHTML = "";
 
-        let filteredTasks = [];
-
-        if (filter === "all") {
-            filteredTasks = tasks;
-        } else if (filter === "my") {
-            filteredTasks = tasks.filter(task => task.taskAssignedTo.includes(currentUser.email));
-        } else if (filter === "created") {
-            filteredTasks = tasks.filter(task => task.taskCreatedBy === currentUser.email);
-        }
-
-        const activeTasks = filteredTasks.filter(task => task.taskProgress !== "Completed");
-        const completedTasks = filteredTasks.filter(task => task.taskProgress === "Completed");
+        const activeTasks = taskList.filter(task => task.taskProgress !== "Completed");
+        const completedTasks = taskList.filter(task => task.taskProgress === "Completed");
 
         // Render active tasks
         activeTasks.forEach(task => {
@@ -144,26 +236,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Function to show all tasks
+    function showAllTasks() {
+        renderTaskList(tasks);
+    }
+
+    // Function to show my tasks
+    function showMyTasks() {
+        renderTaskList(myTasks);
+    }
+
+    // Function to show assigned tasks
+    function showAssignedTasks() {
+        renderTaskList(assignedTasks);
+    }
+
     // Event listeners for navigation links
     allActivitiesLink.addEventListener("click", function () {
         allActivitiesLink.classList.add("active");
         myActivitiesLink.classList.remove("active");
         createdTasksLink.classList.remove("active");
-        renderTasks("all");
+        showAllTasks(); // Show all tasks
     });
 
     myActivitiesLink.addEventListener("click", function () {
         myActivitiesLink.classList.add("active");
         allActivitiesLink.classList.remove("active");
         createdTasksLink.classList.remove("active");
-        renderTasks("my");
+        showAssignedTasks(); // Show assigned tasks
     });
 
     createdTasksLink.addEventListener("click", function () {
         createdTasksLink.classList.add("active");
         allActivitiesLink.classList.remove("active");
         myActivitiesLink.classList.remove("active");
-        renderTasks("created");
+        showMyTasks(); // Show my tasks
     });
 
     // Add task functionality
@@ -209,10 +316,13 @@ document.addEventListener("DOMContentLoaded", function () {
     window.deleteTask = async function (taskId) {
         if (confirm("Are you sure you want to delete this task?")) {
             try {
+                const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+                const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+
                 const response = await fetch(`https://task-assginer.onrender.com/api/tasks/${taskId}`, {
                     method: "DELETE",
                     headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        "Authorization": `${token}`
                     }
                 });
 
@@ -223,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const result = await response.json();
                 if (result.message === "Task deleted successfully") {
                     tasks = tasks.filter(task => task._id !== taskId); // Remove the task from the local array
-                    renderTasks(allActivitiesLink.classList.contains("active") ? "all" : "my");
+                    renderTaskList(allActivitiesLink.classList.contains("active") ? tasks : myActivitiesLink.classList.contains("active") ? assignedTasks : myTasks);
                 }
             } catch (error) {
                 console.error("Error deleting task:", error);
@@ -238,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const taskName = document.getElementById("taskName").value;
         const taskDescription = document.getElementById("taskDescription").value;
-        const taskAssignedTo = document.getElementById("taskAssignedTo").value.split(",").map(email => email.trim());
+        const taskAssignedTo = [document.getElementById("taskAssignedTo").value]; // Wrap the selected email in an array
         const taskProgress = document.getElementById("taskProgress").value;
 
         const taskData = {
@@ -250,13 +360,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
             let response;
+            const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+            const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+
             if (currentTaskId) {
                 // Update existing task
                 response = await fetch(`https://task-assginer.onrender.com/api/tasks/${currentTaskId}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        "Authorization": `${token}`
                     },
                     body: JSON.stringify(taskData)
                 });
@@ -266,7 +379,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        "Authorization": `${token}`
                     },
                     body: JSON.stringify(taskData)
                 });
@@ -288,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 tasks.push(updatedTask);
             }
 
-            renderTasks(allActivitiesLink.classList.contains("active") ? "all" : "my");
+            renderTaskList(allActivitiesLink.classList.contains("active") ? tasks : myActivitiesLink.classList.contains("active") ? assignedTasks : myTasks);
             modal.style.display = "none";
             taskForm.reset();
             currentTaskId = null;
@@ -319,29 +432,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Logout functionality
     function logout() {
+        const storedUser = JSON.parse(localStorage.getItem("user")); // Retrieve the user object from localStorage
+        const token = storedUser ? storedUser.token : null; // Extract the token from the user object
+    
+        if (!token) {
+            alert("You are not logged in.");
+            window.location.href = "login.html"; // Redirect to login page
+            return;
+        }
+    
         fetch("https://task-assginer.onrender.com/api/auth/logout", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
+                "Content-Type": "application/json",
+                "Authorization": `${token}`
             }
         })
         .then(response => {
             if (response.ok) {
-                localStorage.removeItem("user"); // Remove user data from localStorage
-                localStorage.removeItem("token"); // Remove token from localStorage
-                alert("Logged out successfully");
-                window.location.href = "login.html"; // Redirect to login page
+                return response.json(); // Parse the response JSON
             } else {
                 throw new Error("Failed to logout");
             }
+        })
+        .then(data => {
+            // Store the API response in localStorage
+            localStorage.setItem("user", JSON.stringify({
+                _id: data._id,
+                username: data.username,
+                email: data.email,
+                isAdmin: data.isAdmin,
+                token: data.token
+            }));
+    
+            alert("Logged out successfully");
+            window.location.href = "login.html"; // Redirect to login page
         })
         .catch(error => {
             console.error("Error logging out:", error);
             alert("Failed to logout. Please try again.");
         });
     }
-
     // Initial setup
     handleUserRole(); // Handle user role on page load
-    fetchTasks(); // Fetch tasks from the API on page load
+    fetchTasks(); // Fetch all tasks from the API on page load
+    fetchMyTasks(); // Fetch my tasks from the API on page load
+    fetchAssignedTasks(); // Fetch assigned tasks from the API on page load
+    fetchUsers(); // Fetch users and populate the taskAssignedTo dropdown on page load
 });
