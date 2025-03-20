@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", function () {
               _id: data._id,
               username: data.username,
               email: data.email,
-              isAdmin: data.isAdmin
+              isAdmin: data.isAdmin,
+              token: data.token
+            
           }));
 
           window.location.href = "Main.html"; // Redirect after sign-up
